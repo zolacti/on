@@ -7,6 +7,10 @@ jobs:
     steps:
     - uses: actions/checkout@master
       with:
-        path: actions
-    - uses: ./actions    
-    - uses: ./actions
+        ref: site
+        submodules: true
+    - uses: knzai/zola-cli@main
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: public

@@ -1,0 +1,28 @@
+name: 'command'
+description: 'Run zola build'
+author: 'Kenzi Connor'
+inputs:
+  content:
+    description: Directory to run zola build in - root of the content site
+    required: false
+    default: '.'
+    type: string
+  output:
+    description: Directory to output content to
+    required: false
+    default: 'public'
+    type: string
+  flags:
+    description: flags for check and build, eg --drafts --base-url
+    required: false
+    default: ''
+    type: string
+runs:
+  using: 'composite'
+  steps:
+    - name: Output variables
+      shell: bash
+      run:  echo '${{ toJSON(inputs) }}'
+    - name: zola build
+      shell: bash
+      run: zola --root ${{inputs.content}} build --output-dir ${{ inputs.output }} ${{ inputs.flags }}

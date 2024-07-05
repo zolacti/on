@@ -1,0 +1,20 @@
+name: 'install'
+description: 'Install zola'
+author: 'Kenzi Connor'
+runs:
+  using: 'composite'
+  steps:
+    - name: output variables
+      shell: bash
+      run: |
+        echo '${{ toJSON(inputs) }}'
+        echo '${{ env['ZOLA_INSTALLED'] }}'
+    - name: Install zola
+      if:  true && ! env.ZOLA_INSTALLED
+      uses: taiki-e/install-action@zola
+    - name: store install state of zola for idempotency
+      shell: bash
+      run: |
+        if command -v zola > /dev/null 2>&1; then
+            echo "ZOLA_INSTALLED=true" >> $GITHUB_ENV
+        fi

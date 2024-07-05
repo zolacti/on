@@ -1,24 +1,61 @@
 #Still depends on triggering default gh deploy actions 
-name: 'Zola CLI'
-description: 'Run zola build/check (and deploy to GitHub Pages)'
-author: 'Kenzi Connor'
+name: Zola CLI
+description: Run zola build/check with idempotent zola install
+author: Kenzi Connor
 branding:
-  icon: 'book'  
-  color: 'green'
+  icon: book
+  color: green
+inputs:
+  command:
+    description: zola command to run - check|build (or both). Install is idempotent and called by all others
+    required: false
+    default: 'build'
+    type: choice
+    options:
+      - install
+      - check
+      - build
+      - both
+  content:
+    description: Directory to run zola build in - root of the content site
+    required: false
+    default: '.'
+    type: string
+  output:
+    description: Directory to output content to
+    required: false
+    default: public
+    type: string
+  check-flags:
+    description: flags for check, eg --drafts.
+    required: false
+    default: ''
+    type: string
+  build-flags:
+    description: flags for build, eg --drafts --base-url
+    required: false
+    default: ''
+    type: string
 runs:
-  using: 'composite'
+  using: composite
   steps:
-    - name: Output variables
+    - name: output variables
       shell: bash
-      run: |
-        echo '${{ toJSON(inputs) }}'
-        echo '${{ env['ZOLA_INSTALLED'] }}'
-    - name: Install zola
-      if:  true && ! env.ZOLA_INSTALLED
-      uses: taiki-e/install-action@zola
-    - name: Store install state of zola for idempotency
-      shell: bash
-      run: |
-        if command -v zola > /dev/null 2>&1; then
-            echo "ZOLA_INSTALLED=true" >> $GITHUB_ENV
-        fi
+      run: echo '${{ toJSON(inputs) }}'
+    - uses: actions/checkout@master
+      with:
+        path: zola-cli
+    - uses: ./zola-cli/install
+    - name: zola check
+      if: inputs.command == 'check' || inputs.command == 'both'
+      uses: ./zola-cli/check
+      with:
+        content: ${{inputs.content}}
+        flags: ${{inputs.flags}}
+    - name: zola build
+      if: inputs.command == 'build' || inputs.command == 'both'
+      uses: ./zola-cli/build
+      with:
+        content: ${{inputs.content}}
+        output: ${{inputs.output}}
+        flags: ${{inputs.build-flags}}
