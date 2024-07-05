@@ -10,9 +10,15 @@ runs:
   steps:
     - name: Output variables
       shell: bash
-      run:  echo '${{ toJSON(inputs) }}'
+      run: |
+        echo '${{ toJSON(inputs) }}'
+        echo '${{ env['ZOLA_INSTALLED'] }}'
     - name: Install zola
+      if:  true && ! env.ZOLA_INSTALLED
       uses: taiki-e/install-action@zola
-    - name: Verify zola
+    - name: Store install state of zola for idempotency
       shell: bash
-      run:  echo zola --version
+      run: |
+        if command -v zola > /dev/null 2>&1; then
+            echo "ZOLA_INSTALLED=true" >> $GITHUB_ENV
+        fi

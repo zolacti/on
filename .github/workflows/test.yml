@@ -2,10 +2,11 @@
 on: push
 name: Test Zola CLI
 jobs:
-  push:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
       with:
         path: actions
+    - uses: ./actions    
     - uses: ./actions
