@@ -1,0 +1,42 @@
+#Still depends on triggering default gh deploy actions 
+name: 'command'
+description: 'Run zola commands (check or build)'
+author: 'Kenzi Connor'
+inputs:
+  command:
+    description: 'Which zola command to run'
+    required: false
+    default: 'build'
+    type: choice
+    options:
+      - check
+      - build
+  content:
+    description: Directory to run zola build in - root of the content site
+    required: false
+    default: '.'
+    type: string
+  output:
+    description: Directory to output content to
+    required: false
+    default: 'output'
+    type: string
+  flags:
+    description: flags for check and build, eg --drafts --base-url
+    required: false
+    default: ''
+    type: string
+runs:
+  using: 'composite'
+  steps:
+    - name: Output variables
+      shell: bash
+      run:  echo '${{ toJSON(inputs) }}'
+    - name: zola build
+      if: inputs.command == 'build'
+      shell: bash
+      run: zola --root content/${{inputs.content}} build --output-dir ${{ inputs.output }} ${{ inputs.flags }}
+    - name: zola check
+      if: inputs.command == 'check'
+      shell: bash
+      run: zola --root content/${{ inputs.content }} check ${{ inputs.flags }}

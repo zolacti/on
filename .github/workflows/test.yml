@@ -1,0 +1,11 @@
+# Trigger the workflow on push or pull request
+on: push
+name: Test Zola CLI
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        path: actions
+    - uses: ./actions

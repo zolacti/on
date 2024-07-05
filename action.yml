@@ -1,0 +1,18 @@
+#Still depends on triggering default gh deploy actions 
+name: 'Zola CLI'
+description: 'Run zola build/check (and deploy to GitHub Pages)'
+author: 'Kenzi Connor'
+branding:
+  icon: 'book'  
+  color: 'green'
+runs:
+  using: 'composite'
+  steps:
+    - name: Output variables
+      shell: bash
+      run:  echo '${{ toJSON(inputs) }}'
+    - name: Install zola
+      uses: taiki-e/install-action@zola
+    - name: Verify zola
+      shell: bash
+      run:  echo zola --version
