@@ -68,7 +68,7 @@ runs:
     - uses: actions/checkout@master
       with:
         path: zola-cli
-    - uses: ./zola-cli/install
+    - uses: ./zola-cli/idempotent_install
     - name: zola check
       if: inputs.command == 'check' || inputs.command == 'both'
       shell: bash

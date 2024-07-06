@@ -1,5 +1,5 @@
-name: 'install'
-description: 'Install zola'
+name: 'idempotent install'
+description: 'Install zola only once'
 author: 'Kenzi Connor'
 runs:
   using: 'composite'
