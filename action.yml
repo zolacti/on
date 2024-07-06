@@ -7,15 +7,16 @@ branding:
   color: green
 inputs:
   command:
-    description: specify zola command, otherwise defaults to both. Install is idempotent and always called
+    description: Specify zola command. Install is always run and idempotetent. Deploy runs all of them.
     required: false
-    default: 'both'
+    default: 'deploy'
     type: choice
     options:
       - install
       - check
       - build
       - both
+      - deploy
   root:
     description: Directory to use as root of project 
     required: false
@@ -67,10 +68,16 @@ runs:
         echo "build_flags=$build_flags" >> $GITHUB_ENV
     - uses: knzai/zola-cli@idempotent_install
     - name: zola check
-      if: inputs.command == 'check' || inputs.command == 'both'
+      if: inputs.command != 'install' && inputs.command != 'build'
       shell: bash
       run: $base_command check $drafts_flag
     - name: zola build
-      if: inputs.command == 'build' || inputs.command == 'both'
+      if: inputs.command != 'install' && inputs.command != 'check'
       shell: bash
       run: $base_command build $drafts_flag $build_flags
+    - name: Deploy 🚀
+      if: inputs.command == 'deploy'
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: ${{inputs.root}}/${{inputs.output-dir}}
+      

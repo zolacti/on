@@ -1,8 +1,8 @@
-# GH Action for Zola CLI
+# GH Action for Zola CLI - with deploy
 
 ![Build Status](https://img.shields.io/github/actions/workflow/status/knzai/zola-cli/test.yml)
 
-A GitHub action that mostly replicates the [zola](https://github.com/getzola/zola) static site generator's [CLI](https://www.getzola.org/documentation/getting-started/cli-usage/). This is used for compiling the content before pushing it to somewhere, like GH-Pages
+A GitHub action that mostly replicates the [zola](https://github.com/getzola/zola) static site generator's [CLI](https://www.getzola.org/documentation/getting-started/cli-usage/). The default deploy options are included, with some details on how to explicitely specify a separate deploy action for full control.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ If you want to push this content to GH Pages, make sure that workflows have read
 
 Also, after a push as been made pages branch (generally gh-pages) **Settings > General > Pages > Build and deployment** should be set to "deploy from a branch" and the branch you using for pages. GH's [internal action](https://github.com/actions/deploy-pages) will then handle pushing the artifact up and publishing.
 
-Rather than redo a less powerful version of [James Ives' action for pushing content to gh-pages](JamesIves/github-pages-deploy-action) this repo just focuses actually running the zola commands
+Rather than redo a less powerful version of [James Ives' action for pushing content to gh-pages](JamesIves/github-pages-deploy-action) this repo just focuses actually running the zola commands and passes to that action for the default case. More advanced deployes should explicitely call that instead (see examples)
 
 ## Variables
 Matches the flags and usage in the Zola CLI as closely as makes sense for a GH Action (there is no serve or init)
@@ -26,15 +26,16 @@ Matches the flags and usage in the Zola CLI as closely as makes sense for a GH A
 ```yml
 inputs:
   command:
-    description: specify zola command, otherwise defaults to both. Install is idempotent and always called
+    description: Specify zola command. Install is always run and idempotetent. Deploy runs all of them.
     required: false
-    default: 'both'
+    default: 'deploy'
     type: choice
     options:
       - install
       - check
       - build
       - both
+      - deploy
   root:
     description: Directory to use as root of project 
     required: false
@@ -67,11 +68,25 @@ inputs:
     type: boolean
 ```
 
-
 ## Examples
 
-This example will checkout the repo (with submodules for themes), build and push to gh-pages on after push to the main branch. The default GH Pages action will then deploy if set.
+Check out the repo (with submodules for themes), build and push to gh-pages on after push to the main branch. The default GH Pages action will then deploy it, if set.
+```yml
+name: Deploy Zola to GH Pages
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+    - uses: knzai/zola-cli@main
+```
 
+If you want more flexibility, like not running check, or different deploy options, etc, add an explicit JamesIves/github-pages-deploy-action with options.
+
+Checks out out a different branch for the content, without submodules; skips the check by only running build; includes drafts; and passes some additional flags to the deploy (erasing history on the non standard branch it deploys to). This still depends on the default GH action to publish, unless you include an action to push the artifacts yourself.
 ```yml
 name: Deploy Zola to GH Pages
 on: push
@@ -82,16 +97,20 @@ jobs:
     - uses: actions/checkout@master
       with:
         ref: site
-        submodules: true
-    - uses: knzai/zola-cli@main #or action/zola-cli after I publish
+    - uses: knzai/zola-cli@main 
+      with:
+        command: build
+        drafts: true
+        root: docs
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         folder: public
+        single-commit: true
+        branch: not-gh-pages
 ```
 
-This example will build, check external links, and deploy to gh-pages branch on a push to the main branch
-and it will just build on pull requests, with some extra parameters passed.
+Deploy to gh-pages branch on a push to the main branch and it will just build (and check links) on pull requests
 ```yml
 name: Deploy Zola to GH Pages
 on:
@@ -107,23 +126,13 @@ jobs:
     steps:
       -uses: knzai/zola-cli@main
        with:
-         command: build
-         root: docs
-         drafts: true
+         command: both
           
   build_and_deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: knzai/zola-cli@main
-        with:
-          command: both
-          root: docs
-          drafts: true
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: public
 ```
 
 
