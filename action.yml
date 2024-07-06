@@ -7,7 +7,7 @@ branding:
   color: purple
 inputs:
   root:
-    description: Directory to use as root of project 
+    description: Directory to use as root of project. Deploy does not like this and requires an addition checkout in root
     required: false
     default: '.'
     type: string
@@ -46,37 +46,32 @@ inputs:
     required: false
     default: true
     type: boolean
-
-
 runs:
   using: composite
   steps:
     - name: output variables
       shell: bash
       run: echo '${{toJSON(inputs)}}'
-    - name: build flags
-      shell: bash
-      run: |
-        echo "base_command=zola -r ${{inputs.root}} -c ${{inputs.config}}" >> $GITHUB_ENV
-        if ${{ inputs.drafts }}; then
-          echo "drafts_flag=--draft" >> $GITHUB_ENV
-        fi
-        build_flags='-o ${{inputs.output-dir}}'
-        if ${{inputs.force}}; then
-          build_flags="-o $build_flags --force"
-        fi
-        echo "build_flags=$build_flags" >> $GITHUB_ENV
-    - uses: knzai/zola-cli@idempotent_install
+    - uses: knzai/zola-cli@install
     - name: zola check
       if: inputs.check
-      shell: bash
-      run: $base_command check $drafts_flag
+      uses: knzai/zola-cli@check
+      with:
+        root: ${{inputs.root}}
+        config: ${{inputs.config}}
+        drafts: ${{inputs.drafts}}
     - name: zola build
-      shell: bash
-      run: $base_command build $drafts_flag $build_flags
+      uses: knzai/zola-cli@build
+      with:
+        root: ${{inputs.root}}
+        config: ${{inputs.config}}
+        base-url: ${{inputs.base-url}}
+        drafts: ${{inputs.drafts}}
+        output-dir: ${{inputs.output-dir}}
+        force: ${{inputs.force}}
     - name: Deploy 🚀
       if: inputs.deploy
       uses: JamesIves/github-pages-deploy-action@v4
       with:
-        folder: ${{inputs.root}}/${{inputs.output-dir}}
+        folder: ${{inputs.output-dir}}
       

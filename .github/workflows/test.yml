@@ -9,4 +9,29 @@ jobs:
         submodules: true
         ref: site
     - uses: knzai/zola-build@main
+  test-with-root-not-in-root:
+    runs-on: ubuntu-latest
+    steps:
+     #the deploy action requires checkout and it's messy to do a checkout in public first (gotta deal with deletes etc)
+     #so it's simpler to checkout in root first, then content in folder. Or just not use the root arg really.
+    - uses: actions/checkout@master
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: site
+        path: docs
+    - uses: knzai/zola-build@main
+      with:
+        root: docs
+        base-url: foo.com
+        drafts: true
+        output-dir: not-public
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: not-public
+        single-commit: true
+        branch: not-gh-pages        
+        
+        
         

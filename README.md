@@ -3,13 +3,6 @@
 ![Build Status](https://img.shields.io/github/actions/workflow/status/knzai/zola-build/test.yml)
 
 Builds [zola](https://github.com/getzola/zola) static site generator's site and pushes to gh-pages. If you want a deploy with non default settings an example is giving explicitely calling [JamesIves/github-pages-deploy-action]
-## Table of Contents
-
- - [Setup](#Setup)
- - [Variables](#Variables)
- - [Examples](#Examples)
- - [Development](#Development)
- - [Acknowledgements](#Acknowledgements)
 
 ## Setup
 
@@ -17,13 +10,17 @@ Builds [zola](https://github.com/getzola/zola) static site generator's site and 
 
 - Also, after a push as been made to the gh-pages branch (or manually create the branch first and avoid having to push twice) **Settings > General > Pages > Build and deployment** should be set to "deploy from a branch" and the branch you using for pages (gh-pages). GH's [internal action](https://github.com/actions/deploy-pages) will then handle pushing the artifact up and publishing if you set it in the above step.
 
+## Notes
+
+Makes use of [zola-cli](https://github.com/knzai/zola-cli) heavily for running the actual commands. This mostly is a wrapper to for simple build and deploys
+
 ## Variables
 Matches the flags and usage in the Zola CLI as closely as makes sense for a GH Action (there is no serve or init)
 
 ```yml
 inputs:
   root:
-    description: Directory to use as root of project 
+    description: Directory to use as root of project. Deploy does not like this and requires an addition checkout in root
     required: false
     default: '.'
     type: string
@@ -90,15 +87,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    #the deploy action requires a checkout and it's messy to do a checkout in public first (gotta deal with deletes etc)
+    #so it's simpler to checkout in root first, then content in folder. Or easier just don't use the root in such a way
+    #that you can't have it still be in the root of the repo. Just checkout docs into the root! But you can do it:
+    - uses: actions/checkout@master
     - uses: actions/checkout@master
       with:
-        ref: site
+        ref: docs
+        path: docs
     - uses: knzai/zola-build@main 
       with:
         check: false
         deploy: false
         drafts: true
         root: docs
+    - uses: actions/checkout@master #the deploy action requires a .git in root
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:
@@ -137,12 +140,6 @@ jobs:
 
 The test site lives in the `site` branch
 
-The `idepempotent_install` branch is used for the logic for installing zola. For convenience during development and testing without an extra checkout, it is also [in a subtree](https://git-memo.readthedocs.io/en/latest/subtree.html) in the main repo via
-```git subtree add --prefix idempotent_install idempotent_install``` If you aren't touching that you don't need to know about it.
-
-
 ## Acknowledgements
 
 This project was a simplification of [my earlier version](zola-deploy-action) removing the GH Pages deploy logic to use more robust [existing actions for that](JamesIves/github-pages-deploy-action). My earlier version was a itself a port of [Shaleen Jain's Dockerfile based Zola Deploy Action](shalzz/zola-deploy-action) over to a composite action. Mostly I wanted the option of maintaining history on the gh-pages branch and James Ives' action does that and more.
-
-##
