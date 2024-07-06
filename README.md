@@ -1,41 +1,27 @@
-# GH Action for Zola CLI - with deploy
+# Build (and/or deploy) a getzola/zola site
 
-![Build Status](https://img.shields.io/github/actions/workflow/status/knzai/zola-cli/test.yml)
+![Build Status](https://img.shields.io/github/actions/workflow/status/knzai/zola-build/test.yml)
 
-A GitHub action that mostly replicates the [zola](https://github.com/getzola/zola) static site generator's [CLI](https://www.getzola.org/documentation/getting-started/cli-usage/). The default deploy options are included, with some details on how to explicitely specify a separate deploy action for full control.
-
+Builds [zola](https://github.com/getzola/zola) static site generator's site and pushes to gh-pages. If you want a deploy with non default settings an example is giving explicitely calling [JamesIves/github-pages-deploy-action]
 ## Table of Contents
 
- - [Notes](#Notes)
+ - [Setup](#Setup)
  - [Variables](#Variables)
  - [Examples](#Examples)
  - [Development](#Development)
  - [Acknowledgements](#Acknowledgements)
 
-## Notes
+## Setup
 
-If you want to push this content to GH Pages, make sure that workflows have read *and write* permissions in the repos **Settings > Actions > General > in Workflow permissions**
+- If you want to push this content to GH Pages, make sure that workflows have read *and write* permissions in the repos **Settings > Actions > General > in Workflow permissions**
 
-Also, after a push as been made pages branch (generally gh-pages) **Settings > General > Pages > Build and deployment** should be set to "deploy from a branch" and the branch you using for pages. GH's [internal action](https://github.com/actions/deploy-pages) will then handle pushing the artifact up and publishing.
-
-Rather than redo a less powerful version of [James Ives' action for pushing content to gh-pages](JamesIves/github-pages-deploy-action) this repo just focuses actually running the zola commands and passes to that action for the default case. More advanced deployes should explicitely call that instead (see examples)
+- Also, after a push as been made to the gh-pages branch (or manually create the branch first and avoid having to push twice) **Settings > General > Pages > Build and deployment** should be set to "deploy from a branch" and the branch you using for pages (gh-pages). GH's [internal action](https://github.com/actions/deploy-pages) will then handle pushing the artifact up and publishing if you set it in the above step.
 
 ## Variables
 Matches the flags and usage in the Zola CLI as closely as makes sense for a GH Action (there is no serve or init)
 
 ```yml
 inputs:
-  command:
-    description: Specify zola command. Install is always run and idempotetent. Deploy runs all of them.
-    required: false
-    default: 'deploy'
-    type: choice
-    options:
-      - install
-      - check
-      - build
-      - both
-      - deploy
   root:
     description: Directory to use as root of project 
     required: false
@@ -66,6 +52,16 @@ inputs:
     required: false
     default: false
     type: boolean
+  deploy:
+    description: Push to GitHub-Pages using JamesIves/github-pages-deploy-action defaults
+    required: false
+    default: true
+    type: boolean
+  check:
+    description: Check external links with `zola check`
+    required: false
+    default: true
+    type: boolean
 ```
 
 ## Examples
@@ -81,7 +77,7 @@ jobs:
     - uses: actions/checkout@master
       with:
         submodules: true
-    - uses: knzai/zola-cli@main
+    - uses: knzai/zola-build@main
 ```
 
 If you want more flexibility, like not running check, or different deploy options, etc, add an explicit JamesIves/github-pages-deploy-action with options.
@@ -97,9 +93,10 @@ jobs:
     - uses: actions/checkout@master
       with:
         ref: site
-    - uses: knzai/zola-cli@main 
+    - uses: knzai/zola-build@main 
       with:
-        command: build
+        check: false
+        deploy: false
         drafts: true
         root: docs
     - name: Deploy 🚀
@@ -124,15 +121,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     steps:
-      -uses: knzai/zola-cli@main
+      -uses: knzai/zola-build@main
        with:
-         command: both
+         deploy: false
           
   build_and_deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: knzai/zola-cli@main
+      - uses: knzai/zola-build@main
 ```
 
 
@@ -146,6 +143,6 @@ The `idepempotent_install` branch is used for the logic for installing zola. For
 
 ## Acknowledgements
 
-This project was a simplification of [my earlier version](zola-deploy-action) removing the GH Pages deploy logic to use more robust existing actions for that. My earlier version was a itself a port of [Shaleen Jain's Dockerfile based Zola Deploy Action](shalzz/zola-deploy-action) over to a composite action.
+This project was a simplification of [my earlier version](zola-deploy-action) removing the GH Pages deploy logic to use more robust [existing actions for that](JamesIves/github-pages-deploy-action). My earlier version was a itself a port of [Shaleen Jain's Dockerfile based Zola Deploy Action](shalzz/zola-deploy-action) over to a composite action. Mostly I wanted the option of maintaining history on the gh-pages branch and James Ives' action does that and more.
 
 ##

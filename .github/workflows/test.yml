@@ -8,5 +8,5 @@ jobs:
       with:
         submodules: true
         ref: site
-    - uses: knzai/zola-cli@main
+    - uses: knzai/zola-build@main
         

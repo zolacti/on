@@ -1,22 +1,11 @@
 #Still depends on triggering default gh deploy actions 
-name: Zola CLI
-description: Run zola build/check with idempotent zola install
+name: Zola Build
+description: Build (and/or deploy) a getzola/zola site
 author: Kenzi Connor
 branding:
-  icon: align-justify
+  icon: cast
   color: purple
 inputs:
-  command:
-    description: Specify zola command. Install is always run and idempotetent. Deploy runs all of them.
-    required: false
-    default: 'deploy'
-    type: choice
-    options:
-      - install
-      - check
-      - build
-      - both
-      - deploy
   root:
     description: Directory to use as root of project 
     required: false
@@ -47,6 +36,17 @@ inputs:
     required: false
     default: false
     type: boolean
+  deploy:
+    description: Push to GitHub-Pages using JamesIves/github-pages-deploy-action defaults
+    required: false
+    default: true
+    type: boolean
+  check:
+    description: Check external links with `zola check`
+    required: false
+    default: true
+    type: boolean
+
 
 runs:
   using: composite
@@ -68,15 +68,14 @@ runs:
         echo "build_flags=$build_flags" >> $GITHUB_ENV
     - uses: knzai/zola-cli@idempotent_install
     - name: zola check
-      if: inputs.command != 'install' && inputs.command != 'build'
+      if: inputs.check
       shell: bash
       run: $base_command check $drafts_flag
     - name: zola build
-      if: inputs.command != 'install' && inputs.command != 'check'
       shell: bash
       run: $base_command build $drafts_flag $build_flags
     - name: Deploy 🚀
-      if: inputs.command == 'deploy'
+      if: inputs.deploy
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         folder: ${{inputs.root}}/${{inputs.output-dir}}
