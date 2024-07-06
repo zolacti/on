@@ -7,55 +7,73 @@ branding:
   color: green
 inputs:
   command:
-    description: zola command to run - check|build (or both). Install is idempotent and called by all others
+    description: specify zola command, otherwise defaults to both. Install is idempotent and always called
     required: false
-    default: 'build'
+    default: 'both'
     type: choice
     options:
       - install
       - check
       - build
       - both
-  content:
-    description: Directory to run zola build in - root of the content site
+  root:
+    description: Directory to use as root of project 
     required: false
     default: '.'
     type: string
-  output:
-    description: Directory to output content to
+  config:
+    description: Path to a config file other than config.toml in the root of project
     required: false
-    default: public
+    default: 'config.toml'
     type: string
-  check-flags:
-    description: flags for check, eg --drafts.
-    required: false
-    default: ''
-    type: string
-  build-flags:
-    description: flags for build, eg --drafts --base-url
+  base-url:
+    description: Force the base URL to be that value (defaults to the one in config)
     required: false
     default: ''
     type: string
+  drafts:
+    description: Include drafts when loading the site
+    required: false
+    default: false
+    type: boolean
+  output-dir:
+    description: Outputs the generated site in the given path (by default 'public' dir in project root)
+    required: false
+    default: 'public'
+    type: string
+  force:
+    description: Force building the site even if output directory is non-empty
+    required: false
+    default: false
+    type: boolean
+
 runs:
   using: composite
   steps:
     - name: output variables
       shell: bash
-      run: echo '${{ toJSON(inputs) }}'
+      run: echo '${{toJSON(inputs)}}'
+    - name: build flags
+      shell: bash
+      run: |
+        echo "base_command=zola -r ${{inputs.root}} -c ${{inputs.config}}" >> $GITHUB_ENV
+        if ${{ inputs.drafts }}; then
+          echo "drafts_flag=--draft" >> $GITHUB_ENV
+        fi
+        build_flags='-o ${{inputs.output-dir}}'
+        if ${{inputs.force}}; then
+          build_flags="-o $build_flags --force"
+        fi
+        echo "build_flags=$build_flags" >> $GITHUB_ENV
     - uses: actions/checkout@master
       with:
         path: zola-cli
     - uses: ./zola-cli/install
     - name: zola check
       if: inputs.command == 'check' || inputs.command == 'both'
-      uses: ./zola-cli/check
-      with:
-        content: ${{inputs.content}}
-        flags: ${{inputs.flags}}
+      shell: bash
+      run: $base_command check $drafts_flag
     - name: zola build
       if: inputs.command == 'build' || inputs.command == 'both'
-      uses: ./zola-cli/build
-      with:
-        content: ${{inputs.content}}
-        output: ${{inputs.output}}
-        flags: ${{inputs.build-flags}}
+      shell: bash
+      run: $base_command build $drafts_flag $build_flags
