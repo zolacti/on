@@ -65,10 +65,7 @@ runs:
           build_flags="-o $build_flags --force"
         fi
         echo "build_flags=$build_flags" >> $GITHUB_ENV
-    - uses: actions/checkout@master
-      with:
-        path: zola-cli
-    - uses: ./zola-cli/idempotent_install
+    - uses: knzai/zola-cli@idempotent_install
     - name: zola check
       if: inputs.command == 'check' || inputs.command == 'both'
       shell: bash
