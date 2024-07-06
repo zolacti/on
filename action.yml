@@ -1,0 +1,37 @@
+name: 'zola check'
+description: 'run zola check with flags'
+author: 'Kenzi Connor'        
+inputs:
+  root:
+    description: Directory to use as root of project 
+    required: false
+    default: '.'
+    type: string
+  config:
+    description: Path to a config file other than config.toml in the root of project
+    required: false
+    default: 'config.toml'
+    type: string
+  drafts:
+    description: Include drafts when loading the site
+    required: false
+    default: false
+    type: boolean
+
+runs:
+  using: composite
+  steps:
+    - name: output variables
+      shell: bash
+      run: echo '${{toJSON(inputs)}}'
+    - name: setup flags
+      shell: bash
+      run: |
+        if ${{ inputs.drafts }}; then
+          echo "drafts_flag=--drafts" >> $GITHUB_ENV
+        fi
+    - uses: knzai/zola-cli@install
+    - name: zola check
+      shell: bash
+      run: zola -r ${{inputs.root}} -c ${{inputs.config}} check $drafts_flag
+      
