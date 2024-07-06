@@ -3,8 +3,8 @@ name: Zola CLI
 description: Run zola build/check with idempotent zola install
 author: Kenzi Connor
 branding:
-  icon: book
-  color: green
+  icon: align-justify
+  color: purple
 inputs:
   command:
     description: Specify zola command. Install is always run and idempotetent. Deploy runs all of them.
