@@ -1,0 +1,58 @@
+name: 'zola build'
+description: 'run zola build with flags'
+author: 'Kenzi Connor'        
+inputs:
+  root:
+    description: Directory to use as root of project 
+    required: false
+    default: '.'
+    type: string
+  config:
+    description: Path to a config file other than config.toml in the root of project
+    required: false
+    default: 'config.toml'
+    type: string
+  base-url:
+    description: Force the base URL to be that value (defaults to the one in config)
+    required: false
+    default: ''
+    type: string
+  drafts:
+    description: Include drafts when loading the site
+    required: false
+    default: false
+    type: boolean
+  output-dir:
+    description: Outputs the generated site in the given path (by default 'public' dir in project root)
+    required: false
+    default: 'public'
+    type: string
+  force:
+    description: Force building the site even if output directory is non-empty
+    required: false
+    default: false
+    type: boolean
+
+runs:
+  using: composite
+  steps:
+    - name: output variables
+      shell: bash
+      run: echo '${{toJSON(inputs)}}'
+    - name: setup flags
+      shell: bash
+      run: |
+        if ${{ inputs.drafts }}; then
+          echo "drafts_flag=--drafts" >> $GITHUB_ENV
+        fi
+        if ${{inputs.force}}; then
+           echo "force_flag=--force" >> $GITHUB_ENV
+        fi
+        if ${{inputs.base-url != ''}}; then
+           echo "base_url_flag=--base-url ${{inputs.base-url}}" >> $GITHUB_ENV
+        fi
+    - uses: knzai/zola-cli@install
+    - name: zola build
+      shell: bash
+      run: zola -r ${{inputs.root}} -c ${{inputs.config}} build -o ${{inputs.output-dir}} $base_url_flag $drafts_flag $force_flag
+      
