@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 Allow: /
-Sitemap: foo.com/sitemap.xml
+Sitemap: https://zola-sam.janbaudisch.dev/sitemap.xml
