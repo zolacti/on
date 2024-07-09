@@ -30,7 +30,7 @@ runs:
         if ${{ inputs.drafts }}; then
           echo "drafts_flag=--drafts" >> $GITHUB_ENV
         fi
-    - uses: zolaacti/on@install
+    - uses: zolacti/on@install
     - name: zola check
       shell: bash
       run: zola -r ${{inputs.root}} -c ${{inputs.config}} check $drafts_flag
