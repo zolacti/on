@@ -8,7 +8,7 @@ jobs:
       with:
         submodules: true
         ref: site
-    - uses: knzai/zola-build@main
+    - uses: zolacti/on@main
   test-with-root-not-in-root:
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +20,7 @@ jobs:
         submodules: true
         ref: site
         path: docs
-    - uses: knzai/zola-build@main
+    - uses: zolacti/on@main
       with:
         root: docs
         base-url: foo.com

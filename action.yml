@@ -1,10 +1,10 @@
 #Still depends on triggering default gh deploy actions 
-name: Zola Build
-description: Build (and/or deploy) a getzola/zola site
+name: Zola Action
+description: Build, check, and/or deploy a zola site 
 author: Kenzi Connor
 branding:
-  icon: cast
-  color: purple
+  icon: justified
+  color: orange
 inputs:
   root:
     description: Directory to use as root of project. Deploy does not like this and requires an addition checkout in root
@@ -49,19 +49,15 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: output variables
-      shell: bash
-      run: echo '${{toJSON(inputs)}}'
-    - uses: knzai/zola-cli@install
     - name: zola check
       if: inputs.check
-      uses: knzai/zola-cli@check
+      uses: zolacti/on@check
       with:
         root: ${{inputs.root}}
         config: ${{inputs.config}}
         drafts: ${{inputs.drafts}}
     - name: zola build
-      uses: knzai/zola-cli@build
+      uses: zolacti/on@build
       with:
         root: ${{inputs.root}}
         config: ${{inputs.config}}
