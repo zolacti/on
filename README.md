@@ -148,21 +148,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    #the deploy action requires a checkout and it's messy to do a checkout in public first (gotta deal with deletes etc)
-    #so it's simpler to checkout in root first, then content in folder. Or easier just don't use the root in such a way
-    #that you can't have it still be in the root of the repo. Just checkout docs into the root! But you can do it:
-    - uses: actions/checkout@master
     - uses: actions/checkout@master
       with:
-        ref: docs
-        path: docs
+        ref: docs-site #has the content in a docs folder
     - uses: zolacti/on@main 
       with:
         check: false
         deploy: false
         drafts: true
         root: docs
-    - uses: actions/checkout@master #the deploy action requires a .git in root
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:

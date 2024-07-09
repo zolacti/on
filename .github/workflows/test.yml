@@ -9,17 +9,13 @@ jobs:
         submodules: true
         ref: site
     - uses: zolacti/on@main
-  test-with-root-not-in-root:
+  test-with-root:
     runs-on: ubuntu-latest
     steps:
-     #the deploy action requires checkout and it's messy to do a checkout in public first (gotta deal with deletes etc)
-     #so it's simpler to checkout in root first, then content in folder. Or just not use the root arg really.
-    - uses: actions/checkout@master
     - uses: actions/checkout@master
       with:
         submodules: true
-        ref: site
-        path: docs
+        ref: docs-site
     - uses: zolacti/on@main
       with:
         root: docs
@@ -31,7 +27,4 @@ jobs:
       with:
         folder: not-public
         single-commit: true
-        branch: not-gh-pages        
-        
-        
-        
+        branch: not-gh-pages
