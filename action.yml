@@ -1,9 +1,9 @@
 #Still depends on triggering default gh deploy actions 
-name: Zola Action
+name: zola-action
 description: Build, check, and/or deploy a zola site 
 author: Kenzi Connor
 branding:
-  icon: justified
+  icon: align-justify
   color: orange
 inputs:
   root:

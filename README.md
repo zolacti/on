@@ -12,7 +12,7 @@ Builds [zola](https://github.com/getzola/zola) static site generator's site and 
 
 ## Notes
 
-The logic for the actual zola commands is in subaction via `uses: owner/repo@ref` calls. Deploy is handled via [JamesIves/github-pages-deploy-action] with default arguments. Call that action separately if you need different deploy settings. See examples below.
+The logic for the actual zola commands is in subaction via `uses: owner/repo@ref` calls. Deploy is handled via [JamesIves/github-pages-deploy-action](https://github.com/JamesIves/github-pages-deploy-action) with default arguments. Call that action separately if you need different deploy settings. See examples below.
 
 ## Variables
 Matches the flags and usage in the Zola CLI as closely as makes sense for a GH Action (there is no serve or init)
