@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/</loc>
+        <loc>foo.com/</loc>
     </url>
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/about/</loc>
+        <loc>foo.com/about/</loc>
     </url>
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/posts/</loc>
+        <loc>foo.com/posts/</loc>
     </url>
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/posts/syntax-highlighting/</loc>
+        <loc>foo.com/posts/some-post/</loc>
+        <lastmod>2019-01-01</lastmod>
+    </url>
+    <url>
+        <loc>foo.com/posts/syntax-highlighting/</loc>
         <lastmod>2019-02-02</lastmod>
     </url>
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/tags/</loc>
+        <loc>foo.com/tags/</loc>
     </url>
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/tags/post/</loc>
+        <loc>foo.com/tags/post/</loc>
     </url>
     <url>
-        <loc>https://zola-sam.janbaudisch.dev/tags/syntax/</loc>
+        <loc>foo.com/tags/some/</loc>
+    </url>
+    <url>
+        <loc>foo.com/tags/syntax/</loc>
     </url>
 </urlset>
