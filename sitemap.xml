@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>foo.com/</loc>
+    </url>
+    <url>
+        <loc>foo.com/about/</loc>
+    </url>
+    <url>
+        <loc>foo.com/posts/</loc>
+    </url>
+    <url>
+        <loc>foo.com/posts/some-post/</loc>
+        <lastmod>2019-01-01</lastmod>
+    </url>
+    <url>
+        <loc>foo.com/posts/syntax-highlighting/</loc>
+        <lastmod>2019-02-02</lastmod>
+    </url>
+    <url>
+        <loc>foo.com/tags/</loc>
+    </url>
+    <url>
+        <loc>foo.com/tags/post/</loc>
+    </url>
+    <url>
+        <loc>foo.com/tags/some/</loc>
+    </url>
+    <url>
+        <loc>foo.com/tags/syntax/</loc>
+    </url>
+</urlset>
