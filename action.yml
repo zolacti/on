@@ -4,12 +4,12 @@ author: 'Kenzi Connor'
 runs:
   using: 'composite'
   steps:
-    - name: Install zola
-      if:  true && ! env.zola_installed
-      uses: taiki-e/install-action@zola
-    - name: store install state of zola for idempotency
+    - name: check and store install state of zola for idempotency
       shell: bash
       run: |
         if command -v zola > /dev/null 2>&1; then
             echo "zola_installed=true" >> $GITHUB_ENV
         fi
+    - name: Install zola
+      if:  true && ! env.zola_installed
+      uses: taiki-e/install-action@zola
