@@ -17,7 +17,7 @@ The logic for the actual zola commands is in subaction via `uses: owner/repo@ref
 ## Variables
 Matches the flags and usage in the Zola CLI as closely as makes sense for a GH Action (there is no serve or init)
 
-### zolacti/on@main (or @vn)
+### zolacti/on@main (or @v#)
 Main branch for running full builds/deploys
 ```yml
 inputs:
